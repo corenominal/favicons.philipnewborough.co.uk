@@ -16,8 +16,20 @@ class Home extends BaseController
 
     public function gethistory(): \CodeIgniter\HTTP\ResponseInterface
     {
+        $userUuid = session()->get('user_uuid');
+
+        if ($userUuid === null) {
+            return $this->response->setJSON(['loggedOut' => true]);
+        }
+
+        $historyDir = ROOTPATH . 'public/uploads/favicons/history/' . $userUuid . '/';
+
+        if (! is_dir($historyDir)) {
+            return $this->response->setJSON([]);
+        }
+
         $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(ROOTPATH . 'public/uploads/favicons/history/')
+            new \RecursiveDirectoryIterator($historyDir)
         );
         $data = [];
         foreach ($files as $file) {
@@ -29,10 +41,12 @@ class Home extends BaseController
             }
             $data[] = [
                 'name' => $file->getFilename(),
+                'url'  => base_url('uploads/favicons/history/' . $userUuid . '/' . $file->getFilename()),
                 'size' => $file->getSize(),
                 'date' => date('Y-m-d H:i:s', $file->getMTime()),
             ];
         }
+
         return $this->response->setJSON($data);
     }
 
@@ -79,11 +93,25 @@ class Home extends BaseController
                 return $this->response->setJSON(['error' => 'The icon must be at least 512px x 512px.']);
             }
 
-            $history = ROOTPATH . 'public/uploads/favicons/history/' . $filename;
-            copy($filepath, $history);
-            unlink($filepath);
+            $userUuid = session()->get('user_uuid');
 
-            return $this->createFavicon($history);
+            if ($userUuid !== null) {
+                $historyDir = ROOTPATH . 'public/uploads/favicons/history/' . $userUuid . '/';
+                if (! is_dir($historyDir)) {
+                    mkdir($historyDir, 0755, true);
+                }
+                $history = $historyDir . $filename;
+                copy($filepath, $history);
+                unlink($filepath);
+
+                return $this->createFavicon($history);
+            }
+
+            $result = $this->createFavicon($filepath);
+            unlink($filepath);
+            $this->cleanupTmpFavicons();
+
+            return $result;
         }
 
         return $this->response->setJSON(['error' => 'File upload failed.']);
@@ -91,8 +119,15 @@ class Home extends BaseController
 
     public function gethistoryitem(): \CodeIgniter\HTTP\ResponseInterface
     {
-        $filename = $this->request->getPost('filename');
-        $filepath = ROOTPATH . 'public/uploads/favicons/history/' . basename($filename);
+        $userUuid = session()->get('user_uuid');
+
+        if ($userUuid === null) {
+            return $this->response->setJSON(['error' => 'You must be logged in to access history items.']);
+        }
+
+        $filename   = $this->request->getPost('filename');
+        $historyDir = ROOTPATH . 'public/uploads/favicons/history/' . $userUuid . '/';
+        $filepath   = $historyDir . basename($filename);
 
         if (! file_exists($filepath)) {
             return $this->response->setJSON(['error' => 'File not found.']);
@@ -101,20 +136,52 @@ class Home extends BaseController
         return $this->createFavicon($filepath);
     }
 
+    private function cleanupTmpFavicons(): void
+    {
+        $baseDir   = ROOTPATH . 'public/uploads/favicons/';
+        $threshold = time() - 3600;
+
+        foreach (glob($baseDir . 'tmp-*', GLOB_ONLYDIR) as $dir) {
+            if (filemtime($dir) < $threshold) {
+                $files = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::CHILD_FIRST
+                );
+                foreach ($files as $file) {
+                    $file->isDir() ? rmdir($file->getRealPath()) : unlink($file->getRealPath());
+                }
+                rmdir($dir);
+            }
+        }
+    }
+
     private function createFavicon(string $filepath): \CodeIgniter\HTTP\ResponseInterface
     {
-        $filename  = pathinfo($filepath, PATHINFO_FILENAME);
+        // Determine output directory based on login state
+        $userUuid = session()->get('user_uuid');
+        if ($userUuid !== null) {
+            $outputDir = ROOTPATH . 'public/uploads/favicons/' . $userUuid . '/';
+            $baseUrl   = 'uploads/favicons/' . $userUuid . '/';
+        } else {
+            $tmpId     = bin2hex(random_bytes(16));
+            $outputDir = ROOTPATH . 'public/uploads/favicons/tmp-' . $tmpId . '/';
+            $baseUrl   = 'uploads/favicons/tmp-' . $tmpId . '/';
+        }
+
+        if (! is_dir($outputDir)) {
+            mkdir($outputDir, 0755, true);
+        }
+
         $extension = pathinfo($filepath, PATHINFO_EXTENSION);
-        $filename  = $filename . '.' . $extension;
 
-        copy($filepath, ROOTPATH . 'public/uploads/favicons/icon-512x512.' . $extension);
+        copy($filepath, $outputDir . 'icon-512x512.' . $extension);
 
-        $url = base_url('uploads/favicons/icon-512x512.' . $extension . '?v=' . microtime());
+        $url = base_url($baseUrl . 'icon-512x512.' . $extension . '?v=' . microtime());
 
         $image = service('image', 'imagick');
         $sizes = [16, 32, 48, 64, 128, 180, 192, 256];
         foreach ($sizes as $size) {
-            $new = ROOTPATH . 'public/uploads/favicons/icon-' . $size . 'x' . $size . '.png';
+            $new = $outputDir . 'icon-' . $size . 'x' . $size . '.png';
             $image->withFile($filepath)
                 ->resize($size, $size, true)
                 ->save($new);
@@ -122,14 +189,14 @@ class Home extends BaseController
 
         // Rename icon-180x180.png to apple-touch-icon.png
         rename(
-            ROOTPATH . 'public/uploads/favicons/icon-180x180.png',
-            ROOTPATH . 'public/uploads/favicons/apple-touch-icon.png'
+            $outputDir . 'icon-180x180.png',
+            $outputDir . 'apple-touch-icon.png'
         );
 
         // Copy icon-512x512.png to icon.png
         copy(
-            ROOTPATH . 'public/uploads/favicons/icon-512x512.png',
-            ROOTPATH . 'public/uploads/favicons/icon.png'
+            $outputDir . 'icon-512x512.png',
+            $outputDir . 'icon.png'
         );
 
         // Create favicon.ico via Imagick
@@ -140,7 +207,7 @@ class Home extends BaseController
         $resized = clone $baseImage;
         $resized->resizeImage(16, 16, \Imagick::FILTER_LANCZOS, 1, true);
         $ico->addImage($resized);
-        $ico->writeImage(ROOTPATH . 'public/uploads/favicons/favicon.ico');
+        $ico->writeImage($outputDir . 'favicon.ico');
 
         // Write manifest.json
         $siteName = config('App')->siteName;
@@ -149,10 +216,10 @@ class Home extends BaseController
             'short_name'       => $siteName,
             'description'      => $siteName,
             'icons'            => [
-                ['src' => '/icon-16x16.png',  'sizes' => '16x16',   'type' => 'image/png'],
-                ['src' => '/icon-32x32.png',  'sizes' => '32x32',   'type' => 'image/png'],
-                ['src' => '/icon-48x48.png',  'sizes' => '48x48',   'type' => 'image/png'],
-                ['src' => '/icon-64x64.png',  'sizes' => '64x64',   'type' => 'image/png'],
+                ['src' => '/icon-16x16.png',   'sizes' => '16x16',   'type' => 'image/png'],
+                ['src' => '/icon-32x32.png',   'sizes' => '32x32',   'type' => 'image/png'],
+                ['src' => '/icon-48x48.png',   'sizes' => '48x48',   'type' => 'image/png'],
+                ['src' => '/icon-64x64.png',   'sizes' => '64x64',   'type' => 'image/png'],
                 ['src' => '/icon-128x128.png', 'sizes' => '128x128', 'type' => 'image/png'],
                 ['src' => '/icon-192x192.png', 'sizes' => '192x192', 'type' => 'image/png'],
                 ['src' => '/icon-256x256.png', 'sizes' => '256x256', 'type' => 'image/png'],
@@ -164,7 +231,7 @@ class Home extends BaseController
             'background_color' => '#ffffff',
         ];
         file_put_contents(
-            ROOTPATH . 'public/uploads/favicons/manifest.json',
+            $outputDir . 'manifest.json',
             json_encode($manifest, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
         );
 
@@ -190,10 +257,10 @@ Add the following to the head section of your HTML documents:
 <link rel="manifest" href="/manifest.json" />
 ```
 EOT;
-        file_put_contents(ROOTPATH . 'public/uploads/favicons/README.md', $readme);
+        file_put_contents($outputDir . 'README.md', $readme);
 
         // Delete and recreate zip
-        $zipFile = ROOTPATH . 'public/uploads/favicons/favicons.zip';
+        $zipFile = $outputDir . 'favicons.zip';
         if (file_exists($zipFile)) {
             unlink($zipFile);
         }
@@ -201,14 +268,14 @@ EOT;
         $zip = new \ZipArchive();
         if ($zip->open($zipFile, \ZipArchive::CREATE) === true) {
             $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator(ROOTPATH . 'public/uploads/favicons/')
+                new \RecursiveDirectoryIterator($outputDir)
             );
             foreach ($files as $file) {
-                if ($file->isDir() || strpos($file->getRealPath(), 'history') !== false) {
+                if ($file->isDir() || $file->getFilename() === 'favicons.zip') {
                     continue;
                 }
                 $filePath     = $file->getRealPath();
-                $relativePath = substr($filePath, strlen(ROOTPATH . 'public/uploads/favicons/'));
+                $relativePath = substr($filePath, strlen($outputDir));
                 $zip->addFile($filePath, $relativePath);
             }
             $zip->close();
@@ -216,7 +283,7 @@ EOT;
 
         return $this->response->setJSON([
             'url' => $url,
-            'zip' => base_url('uploads/favicons/favicons.zip'),
+            'zip' => base_url($baseUrl . 'favicons.zip'),
         ]);
     }
 }

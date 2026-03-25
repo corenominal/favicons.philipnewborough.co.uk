@@ -27,6 +27,8 @@ class Filters extends BaseFilters
      */
     private const AUTH_EXCEPTIONS = [
         '/',
+        'upload',
+        'gethistory',
         'metrics/receive',
         'cli/*',
         'api/*',
@@ -39,6 +41,8 @@ class Filters extends BaseFilters
      */
     private const OPTIONAL_AUTH_ROUTES = [
         '/',
+        'upload',
+        'gethistory',
         'metrics/receive',
     ];
 

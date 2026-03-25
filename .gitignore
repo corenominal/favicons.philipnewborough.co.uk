@@ -66,6 +66,13 @@ writable/debugbar/*
 php_errors.log
 
 #-------------------------
+# Uploaded Files
+#-------------------------
+public/uploads/*
+!public/uploads/history/.gitkeep
+
+
+#-------------------------
 # User Guide Temp Files
 #-------------------------
 user_guide_src/build/*

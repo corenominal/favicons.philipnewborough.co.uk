@@ -66,6 +66,7 @@
         </div>
     </div>
 
+    <?php if (session()->get('user_uuid')): ?>
     <div id="faviconHistory" class="row d-none mb-5">
         <div class="col-12">
             <div class="card">
@@ -77,6 +78,17 @@
             </div>
         </div>
     </div>
+    <?php else: ?>
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <p class="mb-0"><i class="bi bi-info-circle me-1"></i> <a href="<?= esc(config('Urls')->auth) ?>login?redirect=<?= urlencode(current_url()) ?>">Log in</a> to keep a history of your uploaded icons.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
 </div> <!-- /.container -->
 <?= $this->endSection() ?>

@@ -73,17 +73,20 @@ document.addEventListener('change', (event) => {
 
 // Fetch and render upload history
 function getHistory() {
+  const historySection = document.getElementById('faviconHistory');
+  if (!historySection) return;
+
   fetch('/gethistory')
     .then((response) => response.json())
     .then((data) => {
-      if (data.length > 0) {
-        document.getElementById('faviconHistory').classList.remove('d-none');
+      if (Array.isArray(data) && data.length > 0) {
+        historySection.classList.remove('d-none');
         const list = document.getElementById('history-list');
         list.innerHTML = '';
         data.forEach((item) => {
           list.insertAdjacentHTML(
             'beforeend',
-            `<li><img data-name="${item.name}" src="/uploads/favicons/history/${item.name}" class="img-favicon-history" alt="Saved favicon"></li>`
+            `<li><img data-name="${item.name}" src="${item.url}" class="img-favicon-history" alt="Saved favicon"></li>`
           );
         });
       }

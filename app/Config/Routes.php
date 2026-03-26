@@ -13,6 +13,7 @@ $routes->post('/deletehistory', 'Home::deletehistory');
 
 // Admin routes
 $routes->get('/admin', 'Admin\Home::index');
+$routes->post('/admin/cleanup-tmp', 'Admin\Home::cleanupTmp');
 
 // API routes
 $routes->match(['get', 'options'], '/api/test/ping', 'Api\Test::ping');

@@ -85,6 +85,7 @@ class Home extends BaseController
         return [
             'guest_upload_count'   => $guestUploadCount,
             'active_guest_count'   => $activeGuestCount,
+            'stale_guest_count'    => $guestUploadCount - $activeGuestCount,
             'user_output_count'    => $userOutputCount,
             'history_user_count'   => count($historyUsers),
             'total_history_items'  => $totalHistoryItems,
@@ -125,5 +126,41 @@ class Home extends BaseController
         }
 
         return round($bytes / 1073741824, 2) . ' GB';
+    }
+
+    public function cleanupTmp(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        $faviconsDir = ROOTPATH . 'public/uploads/favicons/';
+        $threshold   = time() - 3600;
+        $removed     = 0;
+
+        $tmpDirs = glob($faviconsDir . 'tmp-*', GLOB_ONLYDIR) ?: [];
+        foreach ($tmpDirs as $dir) {
+            if (filemtime($dir) < $threshold) {
+                $this->deleteDir($dir);
+                $removed++;
+            }
+        }
+
+        $noun = $removed === 1 ? 'directory' : 'directories';
+        session()->setFlashdata('cleanup_message', "Removed {$removed} stale guest tmp {$noun}.");
+
+        return redirect()->to('/admin');
+    }
+
+    private function deleteDir(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        $iter = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($iter as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($dir);
     }
 }

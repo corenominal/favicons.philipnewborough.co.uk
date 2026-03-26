@@ -2,67 +2,113 @@
 
 <?= $this->section('content') ?>
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-12">
-            
-            <div class="border-bottom border-1 mb-4 pb-4 d-flex align-items-center justify-content-between gap-3">
-                <h2 class="mb-0">Admin Home</h2>
-                <div class="" role="group" aria-label="Page actions">
-                    <button type="button" class="btn btn-outline-primary"><i class="bi bi-plus-circle-fill"></i><span class="d-none d-lg-inline"> New</span></button>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" id="btn-status-filter" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-funnel-fill"></i><span class="d-none d-lg-inline"> Status: All</span></button>
-                        <ul class="dropdown-menu" aria-labelledby="btn-status-filter">
-                            <li><a class="dropdown-item status-filter-item active" href="#" data-value="">All</a></li>
-                            <li><a class="dropdown-item status-filter-item" href="#" data-value="Active">Active</a></li>
-                            <li><a class="dropdown-item status-filter-item" href="#" data-value="Inactive">Inactive</a></li>
-                            <li><a class="dropdown-item status-filter-item" href="#" data-value="Banned">Banned</a></li>
-                        </ul>
+            <div class="border-bottom border-1 mb-4 pb-3">
+                <h2 class="mb-0">Admin Dashboard</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-shrink-0 fs-1 text-primary"><i class="bi bi-upload"></i></div>
+                        <div>
+                            <div class="fs-2 fw-bold"><?= esc($stats['guest_upload_count']) ?></div>
+                            <div class="text-muted small">Guest Uploads (all time)</div>
+                            <div class="small <?= $stats['active_guest_count'] > 0 ? 'text-success' : 'text-muted' ?>"><?= esc($stats['active_guest_count']) ?> active in last hour</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-outline-primary" id="btn-datatable-refresh"><i class="bi bi-arrow-clockwise"></i><span class="d-none d-lg-inline"> Refresh</span></button>
-                    <button type="button" class="btn btn-outline-danger" id="btn-delete" disabled><i class="bi bi-trash3-fill"></i><span class="d-none d-lg-inline"> Delete</span></button>
                 </div>
             </div>
+        </div>
 
-            <p>This is an example table with some sample data.</p>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-shrink-0 fs-1 text-info"><i class="bi bi-people-fill"></i></div>
+                        <div>
+                            <div class="fs-2 fw-bold"><?= esc($stats['history_user_count']) ?></div>
+                            <div class="text-muted small">Users with History</div>
+                            <div class="text-muted small"><?= esc($stats['user_output_count']) ?> with output dirs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <div class="table-responsive">
-                <table id="example-table" class="table table-bordered table-striped table-hover align-middle" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Joined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-shrink-0 fs-1 text-warning"><i class="bi bi-clock-history"></i></div>
+                        <div>
+                            <div class="fs-2 fw-bold"><?= esc($stats['total_history_items']) ?></div>
+                            <div class="text-muted small">Total History Items</div>
+                            <div class="text-muted small"><?= esc($stats['avg_history_per_user']) ?> avg per user</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-shrink-0 fs-1 text-success"><i class="bi bi-hdd-fill"></i></div>
+                        <div>
+                            <div class="fs-2 fw-bold"><?= esc($stats['disk_usage']) ?></div>
+                            <div class="text-muted small">Uploads Disk Usage</div>
+                            <div class="text-muted small">&nbsp;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- User history breakdown -->
+    <?php if (! empty($stats['history_users'])) : ?>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span class="fw-semibold">User History</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>User UUID</th>
+                                <th class="text-end">History Items</th>
+                                <th class="text-end">Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($stats['history_users'] as $user) : ?>
+                            <tr>
+                                <td class="font-monospace small"><?= esc($user['uuid']) ?></td>
+                                <td class="text-end"><?= esc($user['item_count']) ?></td>
+                                <td class="text-end text-muted small"><?= esc($user['last_active']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
-</div>
-<!-- Delete confirmation modal -->
-<div class="modal fade" id="modal-delete-confirm" tabindex="-1" aria-labelledby="modal-delete-confirm-label" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-delete-confirm-label">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete <strong id="delete-modal-count">0</strong> selected record(s)? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="btn-delete-confirm">Delete</button>
-            </div>
-        </div>
-    </div>
 </div>
 <?= $this->endSection() ?>

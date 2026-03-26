@@ -8,7 +8,7 @@
 function showToast(title, message, type) {
   const id = `toast-${Date.now()}`;
   const html = `
-    <div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="${id}" class="toast align-items-center border-${type} border-2" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">
           <strong>${title}</strong> ${message}

@@ -9,6 +9,7 @@ $routes->get('/', 'Home::index');
 $routes->post('/upload', 'Home::upload');
 $routes->get('/gethistory', 'Home::gethistory');
 $routes->post('/gethistory', 'Home::gethistoryitem');
+$routes->post('/deletehistory', 'Home::deletehistory');
 
 // Admin routes
 $routes->get('/admin', 'Admin\Home::index');

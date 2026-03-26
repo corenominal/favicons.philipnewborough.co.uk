@@ -15,3 +15,29 @@
 .img-favicon-history:hover {
     transform: scale(1.5);
 }
+
+.history-item {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-delete-history {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    background: rgba(220, 53, 69, 0.9);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+    z-index: 10;
+}
+
+.history-item:hover .btn-delete-history {
+    opacity: 1;
+}

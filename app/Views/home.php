@@ -125,6 +125,9 @@
 &lt;link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"&gt;
 &lt;link rel="manifest" href="/manifest.json"&gt;
 &lt;meta name="theme-color" content="<span id="usage-theme-color">#ffffff</span>"&gt;</code></pre>
+                    <button id="btn-copy-snippet" class="btn btn-sm btn-outline-primary mb-3">
+                        <i class="bi bi-clipboard"></i> Copy to clipboard
+                    </button>
                     <p class="text-body-secondary mb-0"><small>The remaining icon sizes and screenshots in the ZIP are referenced automatically by <code>manifest.json</code>.</small></p>
                 </div>
             </div>

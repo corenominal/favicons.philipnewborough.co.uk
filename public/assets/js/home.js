@@ -209,6 +209,19 @@ function updateUsageSnippet() {
   if (el) el.textContent = themeColor;
 }
 
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('#btn-copy-snippet')) return;
+  const btn = document.getElementById('btn-copy-snippet');
+  const code = document.querySelector('#faviconResults pre code');
+  if (!code) return;
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    btn.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied!';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy to clipboard';
+    }, 2000);
+  });
+});
+
 function resetFaviconResults() {
   const results = document.getElementById('faviconResults');
   if (!results.classList.contains('d-none')) {

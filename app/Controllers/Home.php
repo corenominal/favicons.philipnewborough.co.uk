@@ -306,14 +306,14 @@ class Home extends BaseController
             'short_name'       => ! empty($manifestData['short_name']) ? $manifestData['short_name'] : $siteName,
             'description'      => ! empty($manifestData['description']) ? $manifestData['description'] : $siteName,
             'icons'            => [
-                ['src' => '/icon-16x16.png',   'sizes' => '16x16',   'type' => 'image/png'],
-                ['src' => '/icon-32x32.png',   'sizes' => '32x32',   'type' => 'image/png'],
-                ['src' => '/icon-48x48.png',   'sizes' => '48x48',   'type' => 'image/png'],
-                ['src' => '/icon-64x64.png',   'sizes' => '64x64',   'type' => 'image/png'],
-                ['src' => '/icon-128x128.png', 'sizes' => '128x128', 'type' => 'image/png'],
-                ['src' => '/icon-192x192.png', 'sizes' => '192x192', 'type' => 'image/png'],
-                ['src' => '/icon-256x256.png', 'sizes' => '256x256', 'type' => 'image/png'],
-                ['src' => '/icon-512x512.png', 'sizes' => '512x512', 'type' => 'image/png'],
+                ['src' => '/icon-16x16.png',   'sizes' => '16x16',   'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-32x32.png',   'sizes' => '32x32',   'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-48x48.png',   'sizes' => '48x48',   'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-64x64.png',   'sizes' => '64x64',   'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-128x128.png', 'sizes' => '128x128', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-192x192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-256x256.png', 'sizes' => '256x256', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icon-512x512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
             ],
             'screenshots'      => [
                 [

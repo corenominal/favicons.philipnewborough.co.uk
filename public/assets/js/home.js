@@ -78,7 +78,7 @@ document.addEventListener('change', (event) => {
       } else {
         showToast('Image uploaded!', 'Image uploaded and icons created.', 'success');
         document.getElementById('img-preview').src = data.url;
-        document.getElementById('btnFaviconDownload').href = data.zip;
+        document.getElementById('btnFaviconDownload').href = `${data.zip}?v=${Date.now()}`;
         updateUsageSnippet();
         document.getElementById('faviconResults').classList.remove('d-none');
         getHistory();

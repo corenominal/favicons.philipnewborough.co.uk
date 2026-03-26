@@ -212,12 +212,14 @@ class Home extends BaseController
 
     private function extractManifestData(): array
     {
-        $allowedDisplays = ['standalone', 'minimal-ui', 'fullscreen', 'browser'];
-        $hexPattern      = '/^#[0-9a-fA-F]{6}$/';
+        $allowedDisplays      = ['standalone', 'minimal-ui', 'fullscreen', 'browser'];
+        $allowedOrientations  = ['any', 'natural', 'portrait', 'portrait-primary', 'portrait-secondary', 'landscape', 'landscape-primary', 'landscape-secondary'];
+        $hexPattern           = '/^#[0-9a-fA-F]{6}$/';
 
-        $themeColor = $this->request->getPost('manifest_theme_color') ?? '#ffffff';
-        $bgColor    = $this->request->getPost('manifest_background_color') ?? '#ffffff';
-        $display    = $this->request->getPost('manifest_display') ?? 'standalone';
+        $themeColor  = $this->request->getPost('manifest_theme_color') ?? '#ffffff';
+        $bgColor     = $this->request->getPost('manifest_background_color') ?? '#ffffff';
+        $display     = $this->request->getPost('manifest_display') ?? 'standalone';
+        $orientation = $this->request->getPost('manifest_orientation') ?? 'any';
 
         return [
             'name'             => trim((string) ($this->request->getPost('manifest_name') ?? 'My App')),
@@ -226,6 +228,7 @@ class Home extends BaseController
             'theme_color'      => preg_match($hexPattern, $themeColor) ? $themeColor : '#ffffff',
             'background_color' => preg_match($hexPattern, $bgColor) ? $bgColor : '#ffffff',
             'display'          => in_array($display, $allowedDisplays, true) ? $display : 'standalone',
+            'orientation'      => in_array($orientation, $allowedOrientations, true) ? $orientation : 'any',
         ];
     }
 
@@ -330,6 +333,7 @@ class Home extends BaseController
             ],
             'start_url'        => '/',
             'display'          => ! empty($manifestData['display']) ? $manifestData['display'] : 'standalone',
+            'orientation'      => ! empty($manifestData['orientation']) ? $manifestData['orientation'] : 'any',
             'theme_color'      => ! empty($manifestData['theme_color']) ? $manifestData['theme_color'] : '#ffffff',
             'background_color' => $bgColor,
         ];

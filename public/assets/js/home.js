@@ -64,6 +64,7 @@ document.addEventListener('change', (event) => {
   formData.append('manifest_theme_color', manifestData.theme_color);
   formData.append('manifest_background_color', manifestData.background_color);
   formData.append('manifest_display', manifestData.display);
+  formData.append('manifest_orientation', manifestData.orientation);
 
   fetch('/upload', { method: 'POST', body: formData })
     .then((response) => response.json())
@@ -238,6 +239,7 @@ function getManifestData() {
     theme_color: document.getElementById('manifest-theme-color').value.trim(),
     background_color: document.getElementById('manifest-background-color').value.trim(),
     display: document.getElementById('manifest-display').value,
+    orientation: document.getElementById('manifest-orientation').value,
   };
 }
 
@@ -266,6 +268,7 @@ function fillManifestForm(manifest) {
     document.getElementById('manifest-background-color-picker').value = manifest.background_color;
   }
   if (manifest.display) document.getElementById('manifest-display').value = manifest.display;
+  if (manifest.orientation) document.getElementById('manifest-orientation').value = manifest.orientation;
 }
 
 // Sync color picker → text input (live while dragging)
@@ -284,9 +287,14 @@ document.addEventListener('input', (event) => {
   }
 });
 
+// Initialise Bootstrap popovers
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
+  new bootstrap.Popover(el);
+});
+
 // Sync text input → color picker on valid hex entry
 document.addEventListener('change', (event) => {
-  if (event.target.matches('#manifest-display')) {
+  if (event.target.matches('#manifest-display') || event.target.matches('#manifest-orientation')) {
     resetFaviconResults();
   }
   const hexPattern = /^#[0-9a-fA-F]{6}$/;

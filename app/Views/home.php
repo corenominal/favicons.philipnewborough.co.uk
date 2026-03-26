@@ -39,7 +39,7 @@
                             <input type="text" class="form-control" id="manifest-description" value="A web application" placeholder="A web application" required>
                             <div class="form-text">A brief description of your web application.</div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="manifest-theme-color" class="form-label fw-semibold">Theme Color <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="color" class="form-control form-control-color" id="manifest-theme-color-picker" value="#ffffff" title="Choose theme color">
@@ -47,7 +47,7 @@
                             </div>
                             <div class="form-text">The toolbar/accent colour shown in the browser when your app is open.</div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="manifest-background-color" class="form-label fw-semibold">Background Color <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="color" class="form-control form-control-color" id="manifest-background-color-picker" value="#ffffff" title="Choose background color">
@@ -55,7 +55,7 @@
                             </div>
                             <div class="form-text">The background colour shown on the splash screen when your app is launched.</div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="manifest-display" class="form-label fw-semibold">Display Mode <span class="text-danger">*</span></label>
                             <select class="form-select" id="manifest-display" required>
                                 <option value="standalone" selected>standalone</option>
@@ -66,6 +66,31 @@
                             <div class="form-text">
                                 <strong>standalone</strong> hides browser UI &mdash; <strong>minimal-ui</strong> shows back/reload &mdash; <strong>fullscreen</strong> no browser chrome &mdash; <strong>browser</strong> normal tab.
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="manifest-orientation" class="form-label fw-semibold">
+                                Orientation
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline"
+                                    data-bs-toggle="popover"
+                                    data-bs-trigger="focus"
+                                    data-bs-placement="top"
+                                    data-bs-html="true"
+                                    data-bs-title="Orientation Limitations"
+                                    data-bs-content="Only applies when <strong>installed as a PWA</strong>; ignored in <code>browser</code> display mode. Support varies by browser and OS.<br><br><strong>any</strong> &mdash; device chooses freely (recommended)<br><strong>natural</strong> &mdash; device&rsquo;s default orientation<br><strong>portrait</strong> &mdash; portrait, either way up<br><strong>portrait-primary</strong> &mdash; portrait, right-way up only<br><strong>portrait-secondary</strong> &mdash; portrait, upside-down only<br><strong>landscape</strong> &mdash; landscape, either way<br><strong>landscape-primary</strong> &mdash; landscape, standard rotation<br><strong>landscape-secondary</strong> &mdash; landscape, reverse rotation">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </label>
+                            <select class="form-select" id="manifest-orientation">
+                                <option value="any" selected>any</option>
+                                <option value="natural">natural</option>
+                                <option value="portrait">portrait</option>
+                                <option value="portrait-primary">portrait-primary</option>
+                                <option value="portrait-secondary">portrait-secondary</option>
+                                <option value="landscape">landscape</option>
+                                <option value="landscape-primary">landscape-primary</option>
+                                <option value="landscape-secondary">landscape-secondary</option>
+                            </select>
+                            <div class="form-text">Controls screen rotation when installed as a PWA.</div>
                         </div>
                     </div>
                 </div>

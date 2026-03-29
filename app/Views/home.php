@@ -14,6 +14,20 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert  border-info d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <div>
+                    <strong>Now available as an installable PWA.</strong>
+                    Try it at <a href="https://favicons-pwa.philipnewborough.co.uk/" class="alert-link" target="_blank" rel="noopener noreferrer">favicons-pwa.philipnewborough.co.uk</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
     <div class="row mb-5">
         <div class="col-12">
             <div class="card">
